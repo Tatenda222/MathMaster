@@ -68,15 +68,20 @@ export default function Calculator() {
     setState(prev => {
       if (prev.operation && !prev.waitingForNewValue) {
         // Perform calculation with previous operation
-        const result = calculate(parseFloat(prev.previousValue), parseFloat(prev.currentValue), prev.operation);
-        setPreviousCalculation(`${prev.currentValue} ${getOperationSymbol(op)}`);
-        return {
-          ...prev,
-          currentValue: result.toString(),
-          previousValue: result.toString(),
-          operation: op,
-          waitingForNewValue: true,
-        };
+        try {
+          const result = calculate(parseFloat(prev.previousValue), parseFloat(prev.currentValue), prev.operation);
+          setPreviousCalculation(`${prev.currentValue} ${getOperationSymbol(op)}`);
+          return {
+            ...prev,
+            currentValue: result.toString(),
+            previousValue: result.toString(),
+            operation: op,
+            waitingForNewValue: true,
+          };
+        } catch (error) {
+          showError((error as Error).message);
+          return prev;
+        }
       }
       
       setPreviousCalculation(`${prev.currentValue} ${getOperationSymbol(op)}`);
@@ -87,7 +92,7 @@ export default function Calculator() {
         waitingForNewValue: true,
       };
     });
-  }, []);
+  }, [showError]);
 
   const handleDecimal = useCallback(() => {
     setState(prev => {
